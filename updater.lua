@@ -6,14 +6,15 @@ local remote_addresses = {
     "element",
 }
 
-for addr in remote_addresses do
-    local tmp = string.format(templ, addr)
-    if http.checkURL(tmp) then
-        local res = http.get(tmp)
+for _,name in remote_addresses do
+    local url = string.format(templ, name)
+    local filename = string.format("%s.lua", name)
+    if http.checkURL(url) then
+        local res = http.get(url)
         res = res.readAll()
         
-        fs.delete(string.format("%s.lua", addr))
-        local file = fs.open(string.format("%s.lua", addr), "w")
+        fs.delete(filename)
+        local file = fs.open(filename, "w")
         file.write(res)
         file.close()
 
