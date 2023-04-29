@@ -39,6 +39,7 @@ function GUI.draw(self)
 end
 
 function GUI.run(self)
+    print("run")
     local eventData = {os.pullEvent()}
     local event = eventData[1]
     if event == "mouse_click" then
