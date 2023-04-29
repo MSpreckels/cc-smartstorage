@@ -4,6 +4,7 @@ local templ = "https://raw.githubusercontent.com/MSpreckels/cc-smartstorage/mast
 local remote_addresses = {
     "gui",
     "element",
+    "inputfield"
 }
 
 for _,name in pairs(remote_addresses) do
