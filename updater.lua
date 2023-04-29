@@ -8,6 +8,7 @@ local remote_addresses = {
 }
 
 for _,name in pairs(remote_addresses) do
+    print(string.format("loading %s...", name))
     local url = string.format(templ, name)
     local filename = string.format("%s.lua", name)
     if http.checkURL(url) then
@@ -18,10 +19,13 @@ for _,name in pairs(remote_addresses) do
         local file = fs.open(filename, "w")
         file.write(res)
         file.close()
+        print(string.format("loading %s done.", name))
 
-        shell.run("gui")
     else
         print("Cannot pull remote_address")
         return
     end
 end
+
+shell.run("gui")
+
