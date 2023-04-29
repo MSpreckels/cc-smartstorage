@@ -27,5 +27,5 @@ for _,name in pairs(remote_addresses) do
     end
 end
 
-shell.run("gui")
+-- shell.run("gui")
 

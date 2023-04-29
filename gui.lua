@@ -51,7 +51,7 @@ function GUI.run(self)
     GUI:run()
 end
 
-GUI:upgrade()
+-- GUI:upgrade()
 GUI:init()
 
 GUI:run()
