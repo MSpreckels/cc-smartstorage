@@ -7,6 +7,7 @@ function GUI.upgrade(self)
         local res = http.get(GUI.remote_address)
         res = res.readAll()
      
+        fs.delete("updater.lua")
         local file = fs.open("updater.lua", "w")
         file.write(res)
         file.close()
@@ -39,11 +40,12 @@ function GUI.draw(self)
 end
 
 function GUI.run(self)
-    print("run")
     local eventData = {os.pullEvent()}
     local event = eventData[1]
     if event == "mouse_click" then
         print("mouse click at pos " .. eventData[3] .. "," .. eventData[4])
+    elseif event == "key" then
+        print("key pressed " .. eventData[2])
     end
 
     GUI:run()
