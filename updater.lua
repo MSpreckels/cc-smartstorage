@@ -5,7 +5,7 @@ if http.checkURL(remote_address) then
     local res = http.get(remote_address)
     res = res.readAll()
     
-    os.remove("gui.lua")
+    fs.delete("gui.lua")
     local file = fs.open("gui.lua", "w")
     file.write(res)
     file.close()
