@@ -42,11 +42,11 @@ end
 function GUI.run(self)
     local eventData = {os.pullEvent()}
     local event = eventData[1]
-    if event == "mouse_click" then
-        print("mouse click at pos " .. eventData[3] .. "," .. eventData[4])
-    elseif event == "key" then
-        print("key pressed " .. eventData[2])
-    end
+    -- if event == "mouse_click" then
+    --     print("mouse click at pos " .. eventData[3] .. "," .. eventData[4])
+    -- elseif event == "key" then
+    --     print("key pressed " .. eventData[2])
+    -- end
 
     GUI:run()
 end

@@ -1,17 +1,25 @@
 
-local remote_address = "https://raw.githubusercontent.com/MSpreckels/cc-smartstorage/master/gui.lua"
+local templ = "https://raw.githubusercontent.com/MSpreckels/cc-smartstorage/master/%s.lua"
 
-if http.checkURL(remote_address) then
-    local res = http.get(remote_address)
-    res = res.readAll()
-    
-    fs.delete("gui.lua")
-    local file = fs.open("gui.lua", "w")
-    file.write(res)
-    file.close()
+local remote_addresses = {
+    "gui",
+    "element",
+}
 
-    shell.run("gui")
-else
-    print("Cannot pull remote_address")
-    return
+for addr in remote_addresses do
+    local tmp = string.format(templ, addr)
+    if http.checkURL(tmp) then
+        local res = http.get(tmp)
+        res = res.readAll()
+        
+        fs.delete(string.format("%s.lua", addr))
+        local file = fs.open(string.format("%s.lua", addr), "w")
+        file.write(res)
+        file.close()
+
+        shell.run("gui")
+    else
+        print("Cannot pull remote_address")
+        return
+    end
 end
