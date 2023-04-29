@@ -11,7 +11,7 @@ function GUI.upgrade(self)
         file.write(res)
         file.close()
 
-        os.run("updater")
+        shell.run("updater")
     else
         print("Cannot pull remote_address")
         return
@@ -39,13 +39,16 @@ function GUI.draw(self)
 end
 
 function GUI.run(self)
-    local event = os.pullEvent()
+    local eventData = {os.pullEvent()}
+    local event = eventData[1]
     if event == "mouse_click" then
-        
+        print("mouse click at pos " .. eventData[3] .. "," .. eventData[4])
     end
+
+    GUI:run()
 end
 
--- GUI.upgrade()
+GUI.upgrade()
 GUI:init()
 
 GUI:run()

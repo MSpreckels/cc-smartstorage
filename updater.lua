@@ -10,7 +10,7 @@ if http.checkURL(remote_address) then
     file.write(res)
     file.close()
 
-    os.run("gui")
+    shell.run("gui")
 else
     print("Cannot pull remote_address")
     return
