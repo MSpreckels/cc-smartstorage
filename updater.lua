@@ -6,7 +6,7 @@ local remote_addresses = {
     "element",
 }
 
-for _,name in remote_addresses do
+for _,name in pairs(remote_addresses) do
     local url = string.format(templ, name)
     local filename = string.format("%s.lua", name)
     if http.checkURL(url) then
