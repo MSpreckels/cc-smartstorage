@@ -94,20 +94,22 @@ end
 
 while true do
     input = read()
-    if input == "pullAll" then
+    local args = string_split(input)
+
+    if args[1] == "pullAll" then
         pullAll()
-    elseif input == "flush" then
+    elseif args[1] == "flush" then
         flush()
-    elseif input == "search" then
-        local in_arr = string_split(input)   
-        local res = search(in_arr[2])
+    elseif args[1] == "search" then
+        local res = search(args[2])
         for k, v in pairs(res) do
-            print(string.format("found %s in %s", in_arr[2], v.peripheral))
+            print(string.format("found %s in %s", args[2], v.peripheral))
         end
-    elseif input == "clear" then
+    elseif args[1] == "upgrade" then
+        upgrade()
+    elseif args[1] == "clear" then
         clear()
-    elseif input == "request" then
-        local in_arr = string_split(input)
-        request(in_arr[2], in_arr[3])
+    elseif args[1] == "request" then
+        request(args[2], args[3])
     end
 end
