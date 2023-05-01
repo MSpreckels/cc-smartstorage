@@ -48,6 +48,10 @@ function GUI.run(self)
     --     print("key pressed " .. eventData[2])
     -- end
 
+    for key, value in pairs(t) do
+        
+    end
+
     GUI:run()
 end
 
