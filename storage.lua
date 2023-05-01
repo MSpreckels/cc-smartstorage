@@ -68,7 +68,7 @@ function request(name, amount)
         local detail = peripheral.call(v.peripheral, "getItemDetail", v.slot)
 
         items_pulled = items_pulled + detail.count
-        req_chest.pullItems(v.peripheral, v.slot, tonumber(amount))
+        req_chest.pullItems(v.peripheral, v.slot, amount)
 
         if items_pulled >= amount then
             break
@@ -110,6 +110,10 @@ while true do
     elseif args[1] == "clear" then
         clear()
     elseif args[1] == "request" then
-        request(args[2], args[3])
+        request(args[2], tonumber(args[3]))
     end
+    -- help
+    -- request exact
+    -- group blocks with amount
+    -- cache items for faster delivery
 end
