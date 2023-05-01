@@ -116,4 +116,7 @@ while true do
     -- request exact
     -- group blocks with amount
     -- cache items for faster delivery
+    -- item sort
+    -- smart storage (put new items where old items already are)
+    -- mark storage for only output and no input
 end
