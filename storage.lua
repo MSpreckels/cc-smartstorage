@@ -1,5 +1,5 @@
 require("github")
-req_chest = peripheral.wrap("reinfchest:diamond_chest_11")
+req_chest = peripheral.wrap("minecraft:chest_0")
 
 function upgrade(self)
     download("updater")
