@@ -1,11 +1,10 @@
+require("github")
 req_chest = peripheral.wrap("reinfchest:diamond_chest_11")
 
--- for i = 1, req_chest.size(), 1 do
---    local item = req_chest.list()[i]
---    if item then
---      print(item.name .. " " .. item.count)
---    end
---end
+function upgrade(self)
+    download("updater")
+    shell.run("updater")
+end
 
 function pullAll()
     --print(#peripheral.getNames())
