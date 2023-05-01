@@ -68,7 +68,7 @@ function request(name, amount)
         local detail = peripheral.call(v.peripheral, "getItemDetail", v.slot)
 
         items_pulled = items_pulled + detail.count
-        req_chest.pullItems(v.peripheral, v.slot, amount)
+        req_chest.pullItems(v.peripheral, v.slot, tonumber(amount))
 
         if items_pulled >= amount then
             break
