@@ -78,7 +78,18 @@ end
 
 function clear()
     term.clear()
-    term.setCursorPos(1,1)
+    term.setCursorPos(1, 1)
+end
+
+function string_split(inputstr, sep)
+    if sep == nil then
+        sep = "%s"
+    end
+    local t = {}
+    for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
+        table.insert(t, str)
+    end
+    return t
 end
 
 while true do
@@ -88,13 +99,15 @@ while true do
     elseif input == "flush" then
         flush()
     elseif input == "search" then
-        local res = search("cobble")
+        local in_arr = string_split(input)   
+        local res = search(in_arr[2])
         for k, v in pairs(res) do
-            print(string.format("found %s in %s", "cobble", v.peripheral))
+            print(string.format("found %s in %s", in_arr[2], v.peripheral))
         end
     elseif input == "clear" then
         clear()
     elseif input == "request" then
-        request("cobble", 32)
+        local in_arr = string_split(input)
+        request(in_arr[2], in_arr[3])
     end
 end
