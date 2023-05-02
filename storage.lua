@@ -1,3 +1,14 @@
+-- TODO
+-- [x] help
+-- [x] commands structure
+-- request exact
+-- group blocks with amount
+-- cache items for faster delivery
+-- item sort
+-- smart storage (put new items where old items already are)
+-- mark storage for only output and no input
+
+
 require("github")
 req_chest = peripheral.wrap("minecraft:chest_0")
 
@@ -92,31 +103,83 @@ function string_split(inputstr, sep)
     return t
 end
 
-while true do
-    input = read()
-    local args = string_split(input)
+local commands = {}
+commands.pullAll = {
+    description = "Pulls all items to the request chest",
+    usage = "pullAll",
+    func = function ()
+        print("pullAll")
+    end
+}
 
-    if args[1] == "pullAll" then
-        pullAll()
-    elseif args[1] == "flush" then
-        flush()
-    elseif args[1] == "search" then
+commands.flush = {
+    description = "Sends all item from the request chest to the storage",
+    usage = "flush",
+    func = function ()
+        print("flush")
+    end
+}
+
+commands.search = {
+    description = "searched lazily for an item name.",
+    usage = "search <name>",
+    func = function (args)
         local res = search(args[2])
         for k, v in pairs(res) do
             print(string.format("found %s in %s", args[2], v.peripheral))
         end
-    elseif args[1] == "upgrade" then
+    end
+}
+
+commands.help = {
+    description = "shows all commands",
+    usage = "help",
+    func = function ()
+        for k,v in pairs(commands) do
+            print(k .. " - " .. v.description .. "\nUsage: " .. v.usage .. "\n")
+        end
+    end
+}
+
+commands.upgrade = {
+    description = "upgrades the program",
+    usage = "upgrade",
+    func = function ()
         upgrade()
-    elseif args[1] == "clear" then
+    end
+}
+
+commands.clear = {
+    description = "clears the terminal",
+    usage = "clear",
+    func = function ()
         clear()
-    elseif args[1] == "request" then
+    end
+}
+
+-- TODO: change this to request exact
+commands.request = {
+    description = "request an item lazily",
+    usage = "clear",
+    func = function (args)
         request(args[2], tonumber(args[3]))
     end
-    -- help
-    -- request exact
-    -- group blocks with amount
-    -- cache items for faster delivery
-    -- item sort
-    -- smart storage (put new items where old items already are)
-    -- mark storage for only output and no input
+}
+
+while true do
+    input = read()
+    local args = string_split(input)
+
+    local found = false
+    for k,v in pairs(commands) do
+        if args[1] == k then
+            -- TODO: remove first element
+            v.func(args)
+            found = true
+        end
+    end
+
+    if not found then
+        commands.help.func()
+    end
 end
