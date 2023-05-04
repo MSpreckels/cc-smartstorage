@@ -187,6 +187,15 @@ commands.request = {
     end
 }
 
+commands.print = {
+    description = "prints a message",
+    usage = "print",
+    func = function (args)
+        history_print(args[2])
+    end
+}
+
+
 while true do
     input = read()
     local args = string_split(input)
