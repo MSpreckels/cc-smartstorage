@@ -49,7 +49,7 @@ function pullAll()
             local list = peripheral.call(peri, "list")
             if #list > 0 then
                 for k, v in pairs(list) do
-                    print(string.format("pulling %s from %s", v.name, peri))
+                    history_print(string.format("pulling %s from %s", v.name, peri))
                     req_chest.pullItems(peri, k)
                 end
                 --     print(peripheral.call(peri, "list"))
@@ -66,7 +66,7 @@ function flush()
             list = peripheral.call(peri, "list")
             size = peripheral.call(peri, "size")
             for k, v in pairs(req_chest.list()) do
-                print(string.format("pushing %s to %s", v.name, peri))
+                history_print(string.format("pushing %s to %s", v.name, peri))
                 req_chest.pushItems(peri, k)
             end
         end
@@ -147,7 +147,7 @@ commands.search = {
     func = function (args)
         local res = search(args[2])
         for k, v in pairs(res) do
-            print(string.format("found %s in %s", args[2], v.peripheral))
+            history_print(string.format("found %s in %s", args[2], v.peripheral))
         end
     end
 }
@@ -157,7 +157,7 @@ commands.help = {
     usage = "help",
     func = function ()
         for k,v in pairs(commands) do
-            print(k .. " - " .. v.description .. "\nUsage: " .. v.usage .. "\n")
+            history_print(k .. " - " .. v.description .. "\nUsage: " .. v.usage .. "\n")
         end
     end
 }
