@@ -10,11 +10,32 @@
 
 
 require("github")
+require("history")
 req_chest = peripheral.wrap("minecraft:chest_0")
+items = {}
+last_compiled = 0
 
 function upgrade(self)
     download("updater")
     shell.run("updater")
+end
+
+function compile_items()
+    -- compile a list of all items currently in the network
+    -- later: group by name and add chests with amount to it  
+    for i = 1, #peripheral.getNames(), 1 do
+        local peri = peripheral.getNames()[i]
+        local type = peripheral.getType(peri)
+        if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
+            local list = peripheral.call(peri, "list")
+            for k, v in pairs(list) do
+                local detail = peripheral.call(peri, "getItemDetail", k)
+                table.insert(items, v)
+            end
+        end
+    end
+
+    last_compiled = os.epoch("local")
 end
 
 function pullAll()
@@ -25,9 +46,9 @@ function pullAll()
         --    print(type)
 
         if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
-            local items = peripheral.call(peri, "list")
-            if #items > 0 then
-                for k, v in pairs(items) do
+            local list = peripheral.call(peri, "list")
+            if #list > 0 then
+                for k, v in pairs(list) do
                     print(string.format("pulling %s from %s", v.name, peri))
                     req_chest.pullItems(peri, k)
                 end
