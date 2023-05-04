@@ -195,8 +195,7 @@ commands.print = {
     end
 }
 
-function input()
-    input = read()
+function handle_input(input)
     local args = string_split(input)
     history_print("> " .. input)
 
@@ -214,8 +213,7 @@ function input()
     end
 end
 
-function event()
-    local eventData = {os.pullEvent()}
+function handle_event(eventData)
     local event = eventData[1]
 
     if event == "mouse_scroll" then
@@ -237,8 +235,14 @@ end
 
 while true do
     parallel.waitForAny(
-        input,
-        event
+        function ()
+            input = read()
+            handle_input(input)
+        end,
+        function ()
+            local eventData = {os.pullEvent()}
+            handle_event(eventData)
+        end
     )
 
 
