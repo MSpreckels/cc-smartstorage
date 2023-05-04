@@ -199,6 +199,7 @@ commands.print = {
 while true do
     input = read()
     local args = string_split(input)
+    history_print(input)
 
     local found = false
     for k,v in pairs(commands) do
