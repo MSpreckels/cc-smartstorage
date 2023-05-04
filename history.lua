@@ -3,13 +3,14 @@ local texts = {}
 local w,h = term.getSize()
 local vh = h - 1
 
-function history_print(v)
-    table.insert(history, v)
-    draw()
-end
-
 local yOff = #history - vh
 local oldYOff = yOff
+
+function history_print(v)
+    table.insert(history, v)
+    yOff = #history - vh
+    draw()
+end
 
 function draw()
     term.clear()
