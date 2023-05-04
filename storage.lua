@@ -195,8 +195,7 @@ commands.print = {
     end
 }
 
-
-while true do
+function input()
     input = read()
     local args = string_split(input)
     history_print("> " .. input)
@@ -213,4 +212,34 @@ while true do
     if not found then
         commands.help.func()
     end
+end
+
+function event()
+    local eventData = {os.pullEvent()}
+    local event = eventData[1]
+
+    if event == "mouse_scroll" then
+        history_print(eventData[2])
+        -- yOff = yOff + eventData[2]
+        -- if yOff < 0 then
+        --     yOff = 0
+        -- elseif yOff + vh > #history then
+        --     yOff = #history - vh
+        -- end
+        
+        -- if oldYOff ~= yOff then
+        --     draw()
+        -- end
+        
+        -- oldYOff = yOff
+    end
+end
+
+while true do
+    parallel.waitForAny(
+        input,
+        event
+    )
+
+
 end
