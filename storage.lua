@@ -234,16 +234,17 @@ function handle_event(eventData)
 end
 
 while true do
-    parallel.waitForAny(
-        function ()
-            input = read()
-            handle_input(input)
-        end,
-        function ()
-            local eventData = {os.pullEvent()}
-            handle_event(eventData)
-        end
-    )
-
+    -- parallel.waitForAny(
+    --     function ()
+    --         input = read()
+    --         handle_input(input)
+    --     end,
+    --     function ()
+    --         local eventData = {os.pullEvent()}
+    --         handle_event(eventData)
+    --     end
+    -- )
+    local eventData = {os.pullEvent()}
+    handle_event(eventData)
 
 end
