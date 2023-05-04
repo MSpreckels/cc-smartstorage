@@ -129,7 +129,7 @@ commands.pullAll = {
     description = "Pulls all items to the request chest",
     usage = "pullAll",
     func = function ()
-        print("pullAll")
+        pullAll()
     end
 }
 
@@ -137,7 +137,7 @@ commands.flush = {
     description = "Sends all item from the request chest to the storage",
     usage = "flush",
     func = function ()
-        print("flush")
+        flush()
     end
 }
 
