@@ -15,7 +15,7 @@ local oldYOff = yOff
 function draw()
     term.clear()
     for i = yOff, vh + yOff, 1 do
-        print(history[i])
+        oldprint(history[i])
     end
 end
 
