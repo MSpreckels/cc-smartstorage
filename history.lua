@@ -21,25 +21,17 @@ function draw()
     end
 end
 
--- draw()
-
--- while true do
---     local eventData = {os.pullEvent()}
---     local event = eventData[1]
-
---     if event == "mouse_scroll" then
---         yOff = yOff + eventData[2]
---         if yOff < 0 then
---             yOff = 0
---         elseif yOff + vh > #history then
---             yOff = #history - vh
---         end
-        
---         if oldYOff ~= yOff then
---             draw()
---         end
-        
---         oldYOff = yOff
---     end
--- end
-
+function scroll(amount)
+    yOff = yOff + amount
+    if yOff < 0 then
+        yOff = 0
+    elseif yOff + vh > #history then
+        yOff = #history - vh
+    end
+    
+    if oldYOff ~= yOff then
+        draw()
+    end
+    
+    oldYOff = yOff
+end

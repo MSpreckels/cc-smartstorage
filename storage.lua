@@ -213,44 +213,40 @@ function handle_input(input)
     end
 end
 
-function handle_event(eventData)
-    local event = eventData[1]
+function print_input(input)
+    term.setCursorPos(1, h)
+    term.clearLine()
+    term.write("> " .. input)
+end
 
-    if event == "mouse_scroll" then
-        history_print(eventData[2])
-        -- yOff = yOff + eventData[2]
-        -- if yOff < 0 then
-        --     yOff = 0
-        -- elseif yOff + vh > #history then
-        --     yOff = #history - vh
-        -- end
+print_input("")
+
+local input = ""
+while true do
+    local eventData = {os.pullEvent()}
+    local event = eventData[1]
+    
+    if event == "char" then
+        input = input .. eventData[2]
+
+        print_input(input)
         
-        -- if oldYOff ~= yOff then
-        --     draw()
-        -- end
-        
-        -- oldYOff = yOff
+    elseif event == "key" then
+        if keys.getName(eventData[2]) == "enter" then
+            handle_input(input)
+            input = ""
+        elseif keys.getName(eventData[2]) == "backspace" then
+            input = input:sub(1,-2)
+            print_input(input)
+
+        elseif keys.getName(eventData[2]) == "up" then
+            scroll(-1)
+        elseif keys.getName(eventData[2]) == "down" then
+            scroll(1)
+        elseif keys.getName(eventData[2]) == "end" then
+            term.exit()
+        end
+    elseif event == "mouse_scroll" then
+        scroll(eventData[2])
     end
 end
-
-while true do
-    input = read()
-    handle_input(input)
-end
-
--- parallel.waitForAny(
---     function ()
---         while true do
---             input = read()
---             handle_input(input)
---         end
---     end,
---     function ()
---         while true do
---             local eventData = {os.pullEvent()}
---             print(eventData)
---             handle_event(eventData)
---         end
---     end
-
--- )
