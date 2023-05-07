@@ -12,6 +12,7 @@ require("github")
 require("history")
 req_chest = peripheral.wrap("minecraft:chest_0")
 items = {}
+last_searched_items = {}
 last_compiled = 0
 
 function upgrade(self)
@@ -93,9 +94,8 @@ function search(name)
 end
 
 function request(name, amount)
-    local list = search(name)
     local items_pulled = 0
-    for k, v in pairs(list) do
+    for k, v in pairs(last_searched_items) do
         local detail = peripheral.call(v.peripheral, "getItemDetail", v.slot)
 
         items_pulled = items_pulled + detail.count
@@ -148,6 +148,7 @@ commands.search = {
         for k, v in pairs(res) do
             history_print(string.format("found %s in %s", args[2], v.peripheral))
         end
+        last_searched_items = res
     end
 }
 
