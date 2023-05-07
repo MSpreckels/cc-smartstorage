@@ -8,7 +8,6 @@
 -- smart storage (put new items where old items already are)
 -- mark storage for only output and no input
 
-
 require("github")
 require("history")
 req_chest = peripheral.wrap("minecraft:chest_0")
@@ -211,12 +210,6 @@ function handle_input(input)
     if not found then
         commands.help.func()
     end
-end
-
-function print_input(input)
-    term.setCursorPos(1, h)
-    term.clearLine()
-    term.write("> " .. input)
 end
 
 print_input("")

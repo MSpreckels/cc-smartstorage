@@ -6,6 +6,12 @@ local vh = h - 1
 local yOff = #history - vh
 local oldYOff = yOff
 
+function print_input(input)
+    term.setCursorPos(1, h)
+    term.clearLine()
+    term.write("> " .. input)
+end
+
 function history_print(v)
     table.insert(history, v)
     yOff = #history - vh
