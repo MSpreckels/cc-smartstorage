@@ -227,7 +227,7 @@ while true do
     elseif event == "key" then
         if keys.getName(eventData[2]) == "enter" then
             handle_input(input)
-            input = ""
+            print_input("")
         elseif keys.getName(eventData[2]) == "backspace" then
             input = input:sub(1,-2)
             print_input(input)
