@@ -3,10 +3,12 @@
 -- [x] commands structure
 -- request exact
 -- group blocks with amount
--- cache items for faster delivery
+-- [x] cache items for faster delivery
 -- item sort
--- smart storage (put new items where old items already are)
+-- smart sorting (put new items where old items already are)
 -- mark storage for only output and no input
+-- filled percentage
+-- free slots
 
 require("github")
 require("history")
