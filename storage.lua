@@ -25,6 +25,7 @@ end
 function compile_items()
   -- compile a list of all items currently in the network
   -- later: group by name and add chests with amount to it
+  items = {}
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
     local type = peripheral.getType(peri)
@@ -32,7 +33,22 @@ function compile_items()
       local list = peripheral.call(peri, "list")
       for k, v in pairs(list) do
         local detail = peripheral.call(peri, "getItemDetail", k)
-        table.insert(items, v)
+        if items[detail.name] == nil then
+          items[detail.name] = {}
+          items[detail.name].displayName = detail.displayName
+          items[detail.name].total = detail.count
+          local location = {}
+          location.peripheral = peri
+          location.count = detail.count
+          items[detail.name].locations = {}
+          table.insert(items[detail.name].locations, location)
+        else
+          items[detail.name].total = items[detail.name].total + detail.count
+          local location = {}
+          location.peripheral = peri
+          location.count = detail.count
+          table.insert(items[detail.name].locations, location)
+        end
       end
     end
   end
@@ -194,6 +210,17 @@ commands.print = {
   usage = "print",
   func = function(args)
     history_print(args[2])
+  end
+}
+
+commands.compile = {
+  description = "compiles the current storage system",
+  usage = "compile",
+  func = function(args)
+    compile_items()
+    for k in pairs(items) do
+      history_print(string.format("%s: %s", items[k].displayName, items[k].total))
+    end
   end
 }
 
