@@ -22,13 +22,35 @@ function upgrade(self)
   shell.run("updater")
 end
 
+function max_slots()
+  local slots = 0
+  for i = 1, #peripheral.getNames(), 1 do
+    local peri = peripheral.getNames()[i]
+    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
+      slots = slots + peripheral.call(peri, "size")
+    end
+  end
+
+  return slots
+end
+
+function available_slots()
+  local slots = 0
+  for i = 1, #peripheral.getNames(), 1 do
+    local peri = peripheral.getNames()[i]
+    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
+      slots = slots + #peripheral.call(peri, "list")
+    end
+  end
+  return slots
+end
+
 function compile_items()
   -- compile a list of all items currently in the network
   -- later: group by name and add chests with amount to it
   items = {}
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
-    local type = peripheral.getType(peri)
     if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
       local list = peripheral.call(peri, "list")
       for k, v in pairs(list) do
@@ -221,6 +243,16 @@ commands.compile = {
     for k in pairs(items) do
       history_print(string.format("%s: %s", items[k].displayName, items[k].total))
     end
+  end
+}
+
+commands.slots = {
+  description = "shows available slots and max slots",
+  usage = "slots",
+  func = function(args)
+    local max = max_slots()
+    local avail = available_slots()
+    history_print(string.format("%s / %s", avail, max))
   end
 }
 
