@@ -47,7 +47,7 @@ end
 
 function compile_items()
   history_print("Recompiling items...")
-  redstone.setOutput("bottom", false)
+  redstone.setOutput("bottom", true)
   -- compile a list of all items currently in the network
   -- later: group by name and add chests with amount to it
   items = {}
