@@ -9,6 +9,7 @@
 -- mark storage for only output and no input
 -- [x] filled percentage
 -- [x] free slots
+-- boost performance by only updating the moved items instead of reloading the storage
 
 require("github")
 require("history")
