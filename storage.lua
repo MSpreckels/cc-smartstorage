@@ -1,14 +1,14 @@
 -- TODO
 -- [x] help
 -- [x] commands structure
--- request exact
--- group blocks with amount
+-- [x] request exact
+-- [x] group blocks with amount
 -- [x] cache items for faster delivery
 -- item sort
 -- smart sorting (put new items where old items already are)
 -- mark storage for only output and no input
--- filled percentage
--- free slots
+-- [x] filled percentage
+-- [x] free slots
 
 require("github")
 require("history")
@@ -45,9 +45,13 @@ function available_slots()
   return slots
 end
 
+function set_loading_indicator(enabled)
+  redstone.setOutput("bottom", enabled)
+end
+
 function compile_items()
   history_print("Recompiling items...")
-  redstone.setOutput("bottom", true)
+  set_loading_indicator(true)
   -- compile a list of all items currently in the network
   -- later: group by name and add chests with amount to it
   items = {}
@@ -63,6 +67,7 @@ function compile_items()
           items[detail.name].total = detail.count
           local location = {}
           location.peripheral = peri
+          location.slot = k
           location.count = detail.count
           items[detail.name].locations = {}
           table.insert(items[detail.name].locations, location)
@@ -70,6 +75,7 @@ function compile_items()
           items[detail.name].total = items[detail.name].total + detail.count
           local location = {}
           location.peripheral = peri
+          location.slot = k
           location.count = detail.count
           table.insert(items[detail.name].locations, location)
         end
@@ -80,10 +86,11 @@ function compile_items()
   last_compiled = os.epoch("local")
 
   history_print("Recompiling done.")
-  redstone.setOutput("bottom", false)
+  set_loading_indicator(false)
 end
 
 function flush()
+  set_loading_indicator(true)
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
     local type = peripheral.getType(peri)
@@ -96,6 +103,7 @@ function flush()
       end
     end
   end
+  set_loading_indicator(false)
 end
 
 function search(name)
@@ -111,17 +119,35 @@ function search(name)
 end
 
 function request(name, amount)
-  local items_pulled = 0
-  for k, v in pairs(last_searched_items) do
-    local detail = peripheral.call(v.peripheral, "getItemDetail", v.slot)
-
-    items_pulled = items_pulled + detail.count
-    req_chest.pullItems(v.peripheral, v.slot, amount)
-
-    if items_pulled >= amount then
+  set_loading_indicator(true)
+  local item = nil
+  for k in pairs(items) do
+    if string.find(string.lower(k), string.lower(string.gsub(name, "_", " "))) then
+      item = items[k]
       break
     end
   end
+
+  if not item then
+    history_print(string.format("Could not find item with name %s", name))
+    set_loading_indicator(false)
+    return
+  end
+
+  local amount_to_pull = math.min(item.total, amount)
+  for i = 1, #item.locations, 1 do
+    local loc = item.locations[i]
+    if amount_to_pull > 0 and #req_chest.list() < req_chest.size() then
+      local pull_amount = math.min(loc.count, amount_to_pull)
+      req_chest.pullItems(loc.peripheral, loc.slot, pull_amount)
+      amount_to_pull = amount_to_pull - pull_amount
+    else
+      break
+    end
+  end
+
+  set_loading_indicator(false)
+  compile_items()
 end
 
 function clear()
@@ -160,7 +186,7 @@ commands.search = {
       history_print("No items found with name " .. args[2])
     else
       for _, v in pairs(res) do
-        history_print(string.format("found %s: %s", v.displayName, v.total))
+        history_print(string.format("%s: %s", v.displayName, v.total))
       end
       last_searched_items = res
     end
@@ -199,7 +225,6 @@ commands.request = {
   usage = "clear",
   func = function(args)
     request(args[2], tonumber(args[3]))
-    compile_items()
   end
 }
 
@@ -239,7 +264,7 @@ commands.slots = {
   func = function(args)
     local max = max_slots()
     local avail = available_slots()
-    history_print(string.format("%s / %s", avail, max))
+    history_print(string.format("%s / %s (%.2f %%)", avail, max, (avail / max) * 100))
   end
 }
 
