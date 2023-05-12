@@ -46,6 +46,8 @@ function available_slots()
 end
 
 function compile_items()
+  history_print("Recompiling items...")
+  redstone.setOutput("bottom", false)
   -- compile a list of all items currently in the network
   -- later: group by name and add chests with amount to it
   items = {}
@@ -76,26 +78,9 @@ function compile_items()
   end
 
   last_compiled = os.epoch("local")
-end
 
-function pullAll()
-  --print(#peripheral.getNames())
-  for i = 1, #peripheral.getNames(), 1 do
-    local peri = peripheral.getNames()[i]
-    local type = peripheral.getType(peri)
-    --    print(type)
-
-    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
-      local list = peripheral.call(peri, "list")
-      if #list > 0 then
-        for k, v in pairs(list) do
-          history_print(string.format("pulling %s from %s", v.name, peri))
-          req_chest.pullItems(peri, k)
-        end
-        --     print(peripheral.call(peri, "list"))
-      end
-    end
-  end
+  history_print("Recompiling done.")
+  redstone.setOutput("bottom", false)
 end
 
 function flush()
@@ -114,23 +99,15 @@ function flush()
 end
 
 function search(name)
-  result = {}
-  for i = 1, #peripheral.getNames(), 1 do
-    local peri = peripheral.getNames()[i]
-    local type = peripheral.getType(peri)
-    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
-      local list = peripheral.call(peri, "list")
-      for k, v in pairs(list) do
-        local detail = peripheral.call(peri, "getItemDetail", k)
-        --               print(k .. " " .. detail.displayName .. " " .. " " .. peri)
-        if string.find(string.lower(detail.displayName), string.lower(name)) then
-          -- print(string.format("found %s in %s amount %s", name, peri, v.count))
-          table.insert(result, { peripheral = peri, slot = k })
-        end
-      end
+  results = {}
+  for k in pairs(items) do
+    if string.find(string.lower(items[k].displayName), string.lower(name)) then
+      -- print(string.format("found %s in %s amount %s", name, peri, v.count))
+      table.insert(results, { displayName = items[k].displayName, total = items[k].total })
     end
   end
-  return result
+
+  return results
 end
 
 function request(name, amount)
@@ -164,19 +141,13 @@ function string_split(inputstr, sep)
 end
 
 local commands = {}
-commands.pullAll = {
-  description = "Pulls all items to the request chest",
-  usage = "pullAll",
-  func = function()
-    pullAll()
-  end
-}
 
 commands.flush = {
   description = "Sends all item from the request chest to the storage",
   usage = "flush",
   func = function()
     flush()
+    compile_items()
   end
 }
 
@@ -185,10 +156,14 @@ commands.search = {
   usage = "search <name>",
   func = function(args)
     local res = search(args[2])
-    for k, v in pairs(res) do
-      history_print(string.format("found %s in %s", args[2], v.peripheral))
+    if #res == 0 then
+      history_print("No items found with name " .. args[2])
+    else
+      for _, v in pairs(res) do
+        history_print(string.format("found %s: %s", v.displayName, v.total))
+      end
+      last_searched_items = res
     end
-    last_searched_items = res
   end
 }
 
@@ -224,6 +199,7 @@ commands.request = {
   usage = "clear",
   func = function(args)
     request(args[2], tonumber(args[3]))
+    compile_items()
   end
 }
 
@@ -240,6 +216,17 @@ commands.compile = {
   usage = "compile",
   func = function(args)
     compile_items()
+    for k in pairs(items) do
+      history_print(string.format("%s: %s", items[k].displayName, items[k].total))
+    end
+  end
+}
+
+commands.list = {
+  -- TODO: create command to list all items in items table
+  description = "Lists all items",
+  usage = "list",
+  func = function()
     for k in pairs(items) do
       history_print(string.format("%s: %s", items[k].displayName, items[k].total))
     end
@@ -274,8 +261,11 @@ function handle_input(input)
   end
 end
 
-print_input("")
+if #items == 0 then
+  compile_items()
+end
 
+print_input("")
 local input = ""
 while true do
   local eventData = { os.pullEvent() }
