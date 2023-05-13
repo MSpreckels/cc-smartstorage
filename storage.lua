@@ -84,6 +84,7 @@ function compile_items()
     end
   end
 
+  sort()
   last_compiled = os.epoch("local")
 
   history_print("Recompiling done.")
@@ -165,6 +166,25 @@ function string_split(inputstr, sep)
     table.insert(t, str)
   end
   return t
+end
+
+function sort()
+  local keyset = {}
+
+  for k, v in pairs(items) do
+    table.insert(keyset, { key = k, total = v.total })
+  end
+
+  table.sort(keyset, function(t1, t2)
+    return t1.total < t2.total
+  end)
+
+  local items_sorted = {}
+  for _, v in pairs(keyset) do
+    table.insert(items_sorted, items[v.key])
+  end
+
+  items = items_sorted
 end
 
 local commands = {}
@@ -249,7 +269,6 @@ commands.compile = {
 }
 
 commands.list = {
-  -- TODO: create command to list all items in items table
   description = "Lists all items",
   usage = "list",
   func = function()
