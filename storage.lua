@@ -84,7 +84,6 @@ function compile_items()
     end
   end
 
-  sort()
   draw_header()
   last_compiled = os.epoch("local")
 
@@ -93,6 +92,8 @@ function compile_items()
 end
 
 function flush()
+  -- TODO: rather iterate through the request chest list instead of all other chests
+  history_print("Flushing request chest...")
   set_loading_indicator(true)
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
@@ -101,12 +102,12 @@ function flush()
       list = peripheral.call(peri, "list")
       size = peripheral.call(peri, "size")
       for k, v in pairs(req_chest.list()) do
-        history_print(string.format("pushing %s to %s", v.name, peri))
         req_chest.pushItems(peri, k)
       end
     end
   end
   set_loading_indicator(false)
+  history_print("Flushing done.")
 end
 
 function search(name)
@@ -176,6 +177,7 @@ end
 
 function sort()
   -- TODO: fix sorting
+
   local keyset = {}
 
   for k, v in pairs(items) do
@@ -247,7 +249,6 @@ commands.clear = {
   end
 }
 
--- TODO: change this to request exact
 commands.request = {
   description = "request an item lazily",
   usage = "clear",
@@ -313,13 +314,14 @@ function handle_input(input)
   end
 end
 
+draw_header()
+local input = ""
+print_input("")
+
 if #items == 0 then
   compile_items()
 end
 
-draw_header()
-print_input("")
-local input = ""
 while true do
   local eventData = { os.pullEvent() }
   local event = eventData[1]
@@ -330,9 +332,10 @@ while true do
     print_input(input)
   elseif event == "key" then
     if keys.getName(eventData[2]) == "enter" then
-      handle_input(input)
+      local a = input
       input = ""
       print_input(input)
+      handle_input(a)
     elseif keys.getName(eventData[2]) == "backspace" then
       input = input:sub(1, -2)
       print_input(input)

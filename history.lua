@@ -10,6 +10,7 @@ local yOff = #history - vh
 local oldYOff = yOff
 
 function print_input(input)
+  term.setTextColor(colors.purple)
   term.setCursorPos(1, h)
   term.clearLine()
   term.write("> " .. input)
@@ -22,6 +23,7 @@ function history_print(v)
 end
 
 function draw_header()
+  term.setTextColor(colors.purple)
   term.setCursorPos(1, 1)
   term.clearLine()
   term.write("Storage")
@@ -33,6 +35,7 @@ function draw_header()
 end
 
 function draw()
+  term.setTextColor(colors.white)
   for i = outputMin, outputMax, 1 do
     term.setCursorPos(1, i)
     term.clearLine()
