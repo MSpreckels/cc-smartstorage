@@ -4,7 +4,7 @@
 -- [x] request exact
 -- [x] group blocks with amount
 -- [x] cache items for faster delivery
--- item sort
+-- [x] item sort: show items sorted by amount
 -- smart sorting (put new items where old items already are)
 -- mark storage for only output and no input
 -- [x] filled percentage
