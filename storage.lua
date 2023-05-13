@@ -85,6 +85,7 @@ function compile_items()
   end
 
   sort()
+  draw_header()
   last_compiled = os.epoch("local")
 
   history_print("Recompiling done.")
@@ -123,8 +124,13 @@ end
 function request(name, amount)
   set_loading_indicator(true)
   local item = nil
+  local name = string.lower(name)
+  if string.find(name, "_") then
+    name = string.gsub(name, "_", " ")
+  end
+
   for k in pairs(items) do
-    if string.find(string.lower(k), string.lower(string.gsub(name, "_", " "))) then
+    if string.find(string.lower(k), name) then
       item = items[k]
       break
     end
@@ -169,6 +175,7 @@ function string_split(inputstr, sep)
 end
 
 function sort()
+  -- TODO: fix sorting
   local keyset = {}
 
   for k, v in pairs(items) do
@@ -181,7 +188,7 @@ function sort()
 
   local items_sorted = {}
   for _, v in pairs(keyset) do
-    table.insert(items_sorted, items[v.key])
+    items_sorted[v.key] = items[v.key]
   end
 
   items = items_sorted
@@ -272,8 +279,8 @@ commands.list = {
   description = "Lists all items",
   usage = "list",
   func = function()
-    for k in pairs(items) do
-      history_print(string.format("%s: %s", items[k].displayName, items[k].total))
+    for k, v in pairs(items) do
+      history_print(string.format("%s: %s", v.displayName, v.total))
     end
   end
 }
@@ -310,6 +317,7 @@ if #items == 0 then
   compile_items()
 end
 
+draw_header()
 print_input("")
 local input = ""
 while true do
