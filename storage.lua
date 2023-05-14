@@ -17,6 +17,7 @@ req_chest = peripheral.wrap("minecraft:chest_0")
 items = {}
 last_searched_items = {}
 last_compiled = 0
+keyset = {}
 
 function upgrade(self)
   download("updater")
@@ -53,8 +54,6 @@ end
 function compile_items()
   history_print("Recompiling items...")
   set_loading_indicator(true)
-  -- compile a list of all items currently in the network
-  -- later: group by name and add chests with amount to it
   items = {}
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
@@ -84,6 +83,7 @@ function compile_items()
     end
   end
 
+  sort()
   draw_header()
   last_compiled = os.epoch("local")
 
@@ -114,7 +114,6 @@ function search(name)
   results = {}
   for k in pairs(items) do
     if string.find(string.lower(items[k].displayName), string.lower(name)) then
-      -- print(string.format("found %s in %s amount %s", name, peri, v.count))
       table.insert(results, { displayName = items[k].displayName, total = items[k].total })
     end
   end
@@ -129,9 +128,9 @@ function request(name, amount)
   if string.find(name, "_") then
     name = string.gsub(name, "_", " ")
   end
-
+  history_print(name)
   for k in pairs(items) do
-    if string.find(string.lower(k), name) then
+    if string.lower(items[k].displayName) == name then
       item = items[k]
       break
     end
@@ -176,9 +175,7 @@ function string_split(inputstr, sep)
 end
 
 function sort()
-  -- TODO: fix sorting
-
-  local keyset = {}
+  keyset = {}
 
   for k, v in pairs(items) do
     table.insert(keyset, { key = k, total = v.total })
@@ -187,13 +184,6 @@ function sort()
   table.sort(keyset, function(t1, t2)
     return t1.total < t2.total
   end)
-
-  local items_sorted = {}
-  for _, v in pairs(keyset) do
-    items_sorted[v.key] = items[v.key]
-  end
-
-  items = items_sorted
 end
 
 local commands = {}
@@ -270,9 +260,6 @@ commands.compile = {
   usage = "compile",
   func = function(args)
     compile_items()
-    for k in pairs(items) do
-      history_print(string.format("%s: %s", items[k].displayName, items[k].total))
-    end
   end
 }
 
@@ -280,8 +267,8 @@ commands.list = {
   description = "Lists all items",
   usage = "list",
   func = function()
-    for k, v in pairs(items) do
-      history_print(string.format("%s: %s", v.displayName, v.total))
+    for _, v in pairs(keyset) do
+      history_print(string.format("%s: %s", items[v.key].displayName, items[v.key].total))
     end
   end
 }
