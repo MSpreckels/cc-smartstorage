@@ -10,6 +10,9 @@
 -- [x] filled percentage
 -- [x] free slots
 -- boost performance by only updating the moved items instead of reloading the storage
+-- add ability to attach furnaces or other machines
+-- make storage chests configurable
+-- smelt command
 
 require("github")
 require("history")
