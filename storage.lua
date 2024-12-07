@@ -16,6 +16,7 @@
 
 require("github")
 require("history")
+require("smelter")
 req_chest = peripheral.wrap("minecraft:chest_0")
 items = {}
 last_searched_items = {}
@@ -112,6 +113,8 @@ function init()
     end
   end
   draw_header()
+  
+  Smelter:init()
   history_print("Init Done.")
 end
 
@@ -330,6 +333,14 @@ commands.request_chest = {
   func = function(args)
     set_request_chest(args[2])
     history_print(string.format("Set request chest to %s", args[2]))
+  end
+}
+
+commands.smelt = {
+  description = "smelt amount of item",
+  usage = "smelt",
+  func = function(args)
+    smelt(args[2], tonumber(args[3]))
   end
 }
 
