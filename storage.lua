@@ -74,11 +74,17 @@ function get_item(item)
   return items[item.name]
 end
 
-function remove_item(item, amount)
+function remove_item(item, inventory_index, amount)
   items[item.name].total = items[item.name].total - amount
 
   if items[item.name].total <= 0 then
     items[item.name] = nil
+    return
+  end
+
+  items.inventories[inventory_index].count = items.inventories[inventory_index].count - amount
+  if items.inventories[inventory_index].count <= 0 then
+    items.inventories[inventory_index] = nil
   end
 end
 
@@ -92,7 +98,7 @@ function init()
   history_print("Init Storage..")
   max_slots = 0
   available_slots = 0
-  
+
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
     if is_storage_chest(peri) then
@@ -165,7 +171,7 @@ function request(name, amount)
     local inv = item.inventories[i]
     if amount_to_pull > 0 and #req_chest.list() < req_chest.size() then
       local pull_amount = math.min(inv.count, amount_to_pull)
-      remove_item(item, pull_amount)
+      remove_item(item, i, pull_amount)
       req_chest.pullItems(inv.peripheral, inv.slot, pull_amount)
       amount_to_pull = amount_to_pull - pull_amount
     else
