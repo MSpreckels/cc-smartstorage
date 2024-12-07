@@ -38,6 +38,8 @@ function draw_header()
   term.setCursorPos(w - string.len(num), 1)
   term.write(num)
 
+
+  sleep(10)
   draw_header()
 end
 
