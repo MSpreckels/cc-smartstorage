@@ -54,7 +54,7 @@ function add_item(chest_name, item)
     items[item.name].name = item.name
     items[item.name].displayName = item.displayName
     items[item.name].total = item.count
-    
+
     items[item.name].inventories = {}
     items[item.name].inventories[chest_name] = item.count
   else
@@ -182,9 +182,9 @@ function request(name, amount)
           end
       end
 
-      for _, slotData in pairs(foundSlots) do
-        local pull_amount_from_slot = math.min(slotData.count, item_to_pull_from_inv)
-        req_chest.pullItems(k, slotData.slot, pull_amount_from_slot)
+      for k in pairs(foundSlots) do
+        local pull_amount_from_slot = math.min(foundSlots[k].count, item_to_pull_from_inv)
+        req_chest.pullItems(k, foundSlots[k].slot, pull_amount_from_slot)
         remove_item(item, k, slot_amount)
 
         item_to_pull_from_inv = item_to_pull_from_inv - pull_amount_from_slot
