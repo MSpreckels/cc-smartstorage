@@ -16,7 +16,7 @@
 
 require("github")
 require("history")
-req_chest = nil
+req_chest = peripheral.wrap("minecraft:chest_0")
 items = {}
 last_searched_items = {}
 last_compiled = 0
