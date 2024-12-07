@@ -77,13 +77,18 @@ end
 function remove_item(item, inventory_index, amount)
   items[item.name].total = items[item.name].total - amount
 
+  history_print(string.format("Remove: total %s", items[item.name].total))
+
   if items[item.name].total <= 0 then
+    history_print(string.format("Remove: Item %s", item.name))
     items[item.name] = nil
     return
   end
 
   items[item.name].inventories[inventory_index].count = items[item.name].inventories[inventory_index].count - amount
+  history_print(string.format("Remove: Inventory Count %s", items[item.name].inventories[inventory_index].count))
   if items[item.name].inventories[inventory_index].count <= 0 then
+    history_print(string.format("Remove: Inventory %s", inventory_index))
     items[item.name].inventories[inventory_index] = nil
   end
 end
@@ -98,6 +103,7 @@ function init()
   history_print("Init Storage..")
   max_slots = 0
   available_slots = 0
+  items = {}
 
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
@@ -167,6 +173,9 @@ function request(name, amount)
   end
 
   local amount_to_pull = math.min(item.total, amount)
+
+  history_print(string.format("Pulling %s items", amount_to_pull))
+
   for i = 1, #item.inventories, 1 do
     local inv = item.inventories[i]
     if amount_to_pull > 0 and #req_chest.list() < req_chest.size() then
