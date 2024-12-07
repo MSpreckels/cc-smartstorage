@@ -148,8 +148,8 @@ function request(name, amount)
   end
 
   local amount_to_pull = math.min(item.total, amount)
-  for i = 1, #item.locations, 1 do
-    local loc = item.locations[i]
+  for i = 1, #item.inventories, 1 do
+    local loc = item.inventories[i]
     if amount_to_pull > 0 and #req_chest.list() < req_chest.size() then
       local pull_amount = math.min(loc.count, amount_to_pull)
       req_chest.pullItems(loc.peripheral, loc.slot, pull_amount)
