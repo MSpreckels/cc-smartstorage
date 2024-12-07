@@ -74,11 +74,10 @@ function get_item(item)
 end
 
 function remove_item(item, amount)
-  i = items[item.name]
-  i.total = i.total - amount
+  items[item.name].total = items[item.name].total - amount
 
-  if i.total <= 0 then
-    table.remove(i)
+  if items[item.name].total <= 0 then
+    table.remove(items, item.name)
   end
 end
 
