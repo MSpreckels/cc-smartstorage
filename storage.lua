@@ -273,7 +273,7 @@ commands.list = {
   description = "Lists all items",
   usage = "list",
   func = function()
-    for k, v in pairs(items)
+    for k, v in pairs(items) do
       history_print(string.format("%s: %s", k, v.total))
     end
   end
