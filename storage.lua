@@ -261,11 +261,11 @@ commands.print = {
   end
 }
 
-commands.compile = {
+commands.reinit = {
   description = "compiles the current storage system",
   usage = "compile",
   func = function(args)
-    compile_items()
+    init()
   end
 }
 
