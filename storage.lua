@@ -273,8 +273,8 @@ commands.list = {
   description = "Lists all items",
   usage = "list",
   func = function()
-    for _, v in pairs(keyset) do
-      history_print(string.format("%s: %s", items[v.key].displayName, items[v.key].total))
+    for k, v in pairs(items)
+      history_print(string.format("%s: %s", k, v.total))
     end
   end
 }
