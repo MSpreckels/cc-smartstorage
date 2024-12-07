@@ -165,7 +165,6 @@ function request(name, amount)
   end
 
   set_loading_indicator(false)
-  compile_items()
 end
 
 function clear()
@@ -203,7 +202,6 @@ commands.flush = {
   usage = "flush",
   func = function()
     flush()
-    compile_items()
   end
 }
 
