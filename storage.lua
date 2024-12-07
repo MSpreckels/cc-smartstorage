@@ -73,6 +73,15 @@ function get_item(item)
   return items[item.name]
 end
 
+function remove_item(item, amount)
+  i = items[item.name]
+  i.total = i.total - amount
+
+  if i.total <= 0 then
+    table.remove(i)
+  end
+end
+
 -- Check if peripheral is a storage chest, meaning it has chest in the name and is not the request chest
 function is_storage_chest(peri)
   return peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") and string.find(peri, "chest")
@@ -152,6 +161,7 @@ function request(name, amount)
     local inv = item.inventories[i]
     if amount_to_pull > 0 and #req_chest.list() < req_chest.size() then
       local pull_amount = math.min(inv.count, amount_to_pull)
+      remove_item(item, pull_amount)
       req_chest.pullItems(inv.peripheral, inv.slot, pull_amount)
       amount_to_pull = amount_to_pull - pull_amount
     else
