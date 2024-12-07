@@ -16,14 +16,16 @@
 
 require("github")
 require("history")
-req_chest = peripheral.wrap("minecraft:chest_0")
+req_chest = nil
 items = {}
 last_searched_items = {}
 last_compiled = 0
 keyset = {}
 is_refreshing = false
+max_slots = 0
+available_slots = 0
 
-function upgrade(self)
+function update(self)
   download("updater")
   shell.run("updater")
 end
@@ -32,94 +34,85 @@ function set_request_chest(name)
   req_chest = peripheral.wrap(name)
 end
 
-function max_slots()
-  local slots = 0
-  for i = 1, #peripheral.getNames(), 1 do
-    local peri = peripheral.getNames()[i]
-    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
-      slots = slots + peripheral.call(peri, "size")
-    end
-  end
-
-  return slots
+function get_max_slots()
+   return max_slots
 end
 
-function available_slots()
-  local slots = 0
-  for i = 1, #peripheral.getNames(), 1 do
-    local peri = peripheral.getNames()[i]
-    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
-      slots = slots + #peripheral.call(peri, "list")
-    end
-  end
-  return slots
+function get_available_slots()
+  return available_slots
 end
 
 function set_loading_indicator(enabled)
   redstone.setOutput("bottom", enabled)
 end
 
-function compile_items()
-  is_refreshing = true
-  set_loading_indicator(true)
-  items = {}
+-- Adds an item to the storage, appends the items table
+function add_item(item)
+  if items[item.name] == nil then
+    items[item.name] = {}
+    items[item.name].displayName = item.displayName
+    items[item.name].total = item.count
+    local inventory = {}
+    inventory.peripheral = peri
+    inventory.slot = k
+    inventory.count = item.count
+    items[item.name].inventories = {}
+    table.insert(items[item.name].inventories, inventory)
+  else
+    items[item.name].total = items[item.name].total + item.count
+    local inventory = {}
+    inventory.peripheral = peri
+    inventory.slot = k
+    inventory.count = item.count
+    table.insert(items[item.name].inventories, inventory)
+  end
+end
+
+function get_item(item)
+  return items[item.name]
+end
+
+-- Check if peripheral is a storage chest, meaning it has chest in the name and is not the request chest
+function is_storage_chest(peri)
+  return peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") and string.find(peri, "chest")
+end
+
+-- Initialises the Storage. Fetch all Items in the Network and build the items table. Calculate max slots and available slots
+function init()
+  history_print("Init Storage..")
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
-    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") and string.find(peri, "chest") then
+    if is_storage_chest(peri) then
       local list = peripheral.call(peri, "list")
       for k, v in pairs(list) do
-        local detail = peripheral.call(peri, "getItemDetail", k)
-        if items[detail.name] == nil then
-          items[detail.name] = {}
-          items[detail.name].displayName = detail.displayName
-          items[detail.name].total = detail.count
-          local location = {}
-          location.peripheral = peri
-          location.slot = k
-          location.count = detail.count
-          items[detail.name].locations = {}
-          table.insert(items[detail.name].locations, location)
-        else
-          items[detail.name].total = items[detail.name].total + detail.count
-          local location = {}
-          location.peripheral = peri
-          location.slot = k
-          location.count = detail.count
-          table.insert(items[detail.name].locations, location)
+        add_item(peripheral.call(peri, "getItemDetail", k))
+      end
+
+      max_slots = slots + peripheral.call(peri, "size")
+      available_slots = slots + #peripheral.call(peri, "list")
+    end
+  end
+  history_print("Init Done.")
+end
+
+-- Clears the request chest and puts all items into the storage
+function flush()
+  history_print("Flushing request chest...")
+  for i = 1, #peripheral.getNames(), 1 do
+    local peri = peripheral.getNames()[i]
+    if is_storage_chest(peri) then
+      for k, v in pairs(req_chest.list()) do
+        req_chest.pushItems(peri, k)
+        if v then
+          add_item(v)
         end
       end
     end
   end
-
-  sort()
-  last_compiled = os.epoch("local")
-
-  set_loading_indicator(false)
-  is_refreshing = false
-
-  sleep(5)
-  compile_items()
-end
-
-function flush()
-  -- TODO: rather iterate through the request chest list instead of all other chests
-  history_print("Flushing request chest...")
-  set_loading_indicator(true)
-  for i = 1, #peripheral.getNames(), 1 do
-    local peri = peripheral.getNames()[i]
-    local type = peripheral.getType(peri)
-    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
-      list = peripheral.call(peri, "list")
-      size = peripheral.call(peri, "size")
-      for k, v in pairs(req_chest.list()) do
-        req_chest.pushItems(peri, k)
-      end
-    end
-  end
-  set_loading_indicator(false)
   history_print("Flushing done.")
 end
 
+-- Lazy search an item
 function search(name)
   results = {}
   for k in pairs(items) do
@@ -131,6 +124,7 @@ function search(name)
   return results
 end
 
+-- Request an item with amount by name
 function request(name, amount)
   set_loading_indicator(true)
   local item = nil
@@ -170,6 +164,9 @@ end
 function clear()
   term.clear()
   term.setCursorPos(1, 1)
+  draw_header()
+  local input = ""
+  print_input("")
 end
 
 function string_split(inputstr, sep)
@@ -206,7 +203,7 @@ commands.flush = {
 }
 
 commands.search = {
-  description = "searched lazily for an item name.",
+  description = "lazily search for an item with name.",
   usage = "search <name>",
   func = function(args)
     local res = search(args[2])
@@ -231,11 +228,11 @@ commands.help = {
   end
 }
 
-commands.upgrade = {
-  description = "upgrades the program",
-  usage = "upgrade",
+commands.update = {
+  description = "updates the program",
+  usage = "update",
   func = function()
-    upgrade()
+    update()
   end
 }
 
@@ -318,38 +315,37 @@ function handle_input(input)
   end
 end
 
-local input = ""
-print_input("")
+clear()
 
-function storage_input()
-  while true do
-    local eventData = { os.pullEvent() }
-    local event = eventData[1]
-  
-    if event == "char" then
-      input = input .. eventData[2]
-  
-      print_input(input)
-    elseif event == "key" then
-      if keys.getName(eventData[2]) == "enter" then
-        local a = input
-        input = ""
-        print_input(input)
-        handle_input(a)
-      elseif keys.getName(eventData[2]) == "backspace" then
-        input = input:sub(1, -2)
-        print_input(input)
-      elseif keys.getName(eventData[2]) == "up" then
-        scroll(-1)
-      elseif keys.getName(eventData[2]) == "down" then
-        scroll(1)
-      elseif keys.getName(eventData[2]) == "end" then
-        term.exit()
-      end
-    elseif event == "mouse_scroll" then
-      scroll(eventData[2])
-    end
-  end
+if #items == 0 then
+  init()
 end
 
-parallel.waitForAll(storage_input, draw_header, compile_items)
+while true do
+  local eventData = { os.pullEvent() }
+  local event = eventData[1]
+
+  if event == "char" then
+    input = input .. eventData[2]
+
+    print_input(input)
+  elseif event == "key" then
+    if keys.getName(eventData[2]) == "enter" then
+      local a = input
+      input = ""
+      print_input(input)
+      handle_input(a)
+    elseif keys.getName(eventData[2]) == "backspace" then
+      input = input:sub(1, -2)
+      print_input(input)
+    elseif keys.getName(eventData[2]) == "up" then
+      scroll(-1)
+    elseif keys.getName(eventData[2]) == "down" then
+      scroll(1)
+    elseif keys.getName(eventData[2]) == "end" then
+      term.exit()
+    end
+  elseif event == "mouse_scroll" then
+    scroll(eventData[2])
+  end
+end

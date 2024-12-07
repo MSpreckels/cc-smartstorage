@@ -23,8 +23,8 @@ function history_print(v)
 end
 
 function draw_header()
-  local avail = available_slots()
-  local max = max_slots()
+  local avail = get_available_slots()
+  local max = get_max_slots()
 
   local refresh_char=""
   if is_refreshing then
@@ -39,10 +39,6 @@ function draw_header()
   term.write("Storage")
   term.setCursorPos(w - string.len(num), 1)
   term.write(num)
-
-
-  sleep(1)
-  draw_header()
 end
 
 function draw()
