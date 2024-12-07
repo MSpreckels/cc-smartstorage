@@ -90,6 +90,9 @@ end
 -- Initialises the Storage. Fetch all Items in the Network and build the items table. Calculate max slots and available slots
 function init()
   history_print("Init Storage..")
+  max_slots = 0
+  available_slots = 0
+  
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
     if is_storage_chest(peri) then
