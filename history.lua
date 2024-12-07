@@ -23,23 +23,25 @@ function history_print(v)
 end
 
 function draw_header()
-  term.setTextColor(colors.purple)
-  term.setCursorPos(1, 1)
-  term.clearLine()
-  term.write("Storage")
+  local avail = available_slots()
+  local max = max_slots()
 
   local refresh_char=""
   if is_refreshing then
     refresh_char = "R"
   end
   
-  local num = string.format("%s %s / %s", refresh_char, available_slots(), max_slots())
+  local num = string.format("%s %s / %s", refresh_char, avail, max)
 
+  term.setTextColor(colors.purple)
+  term.setCursorPos(1, 1)
+  term.clearLine()
+  term.write("Storage")
   term.setCursorPos(w - string.len(num), 1)
   term.write(num)
 
 
-  sleep(10)
+  sleep(1)
   draw_header()
 end
 
