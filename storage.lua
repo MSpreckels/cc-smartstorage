@@ -54,10 +54,9 @@ function add_item(chest_name, item)
     items[item.name].name = item.name
     items[item.name].displayName = item.displayName
     items[item.name].total = item.count
-    local inventory = {}
-    inventory[chest_name] = item.count
+    
     items[item.name].inventories = {}
-    table.insert(items[item.name].inventories, inventory)
+    items[item.name].inventories[chest_name] = item.count
   else
     items[item.name].total = items[item.name].total + item.count
 
