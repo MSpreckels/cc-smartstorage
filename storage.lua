@@ -51,6 +51,7 @@ end
 function add_item(peri, item, slot_index)
   if items[item.name] == nil then
     items[item.name] = {}
+    items[item.name].name = item.name
     items[item.name].displayName = item.displayName
     items[item.name].total = item.count
     local inventory = {}
