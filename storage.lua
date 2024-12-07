@@ -82,9 +82,9 @@ function remove_item(item, inventory_index, amount)
     return
   end
 
-  items.inventories[inventory_index].count = items.inventories[inventory_index].count - amount
-  if items.inventories[inventory_index].count <= 0 then
-    items.inventories[inventory_index] = nil
+  items[item.name].inventories[inventory_index].count = items[item.name].inventories[inventory_index].count - amount
+  if items[item.name].inventories[inventory_index].count <= 0 then
+    items[item.name].inventories[inventory_index] = nil
   end
 end
 
