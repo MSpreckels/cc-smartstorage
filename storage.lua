@@ -102,6 +102,7 @@ function init()
       available_slots = available_slots + #peripheral.call(peri, "list")
     end
   end
+  draw_header()
   history_print("Init Done.")
 end
 
@@ -143,9 +144,9 @@ function request(name, amount)
     name = string.gsub(name, "_", " ")
   end
   history_print(name)
-  for k in pairs(items) do
-    if string.lower(items[k].displayName) == name then
-      item = items[k]
+  for k, v in pairs(items) do
+    if string.lower(v.displayName) == name then
+      item = v
       break
     end
   end
@@ -316,7 +317,7 @@ commands.debug = {
       history_print(string.format("-- %s --", k))
       history_print(string.format("Name:%s",v.displayName))
       history_print(string.format("Total:%s",v.total))
-      history_print(string.format("nventories:%s",#v.inventories))
+      history_print(string.format("Inventories:%s",#v.inventories))
       history_print("--------")
     end
   end
