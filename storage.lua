@@ -357,4 +357,4 @@ function storage_input()
   end
 end
 
-parallel.waitForAny(storage_input, draw_header, compile_items)
+parallel.waitForAll(storage_input, draw_header, compile_items)
