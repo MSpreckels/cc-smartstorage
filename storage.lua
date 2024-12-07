@@ -307,6 +307,21 @@ commands.request_chest = {
   end
 }
 
+commands.debug = {
+  description = "output item table",
+  usage = "debug",
+  func = function(args)
+    for k, v in pairs(items) do
+      history_print(string.format("-- %s --", k))
+      history_print(string.format("Name:%s",v.displayName))
+      history_print(string.format("Total:%s",v.total))
+      history_print(string.format("nventories:%s",#v.inventories))
+      history_print("--------")
+    end
+  end
+}
+
+
 function handle_input(input)
   local args = string_split(input)
   history_print("> " .. input)
