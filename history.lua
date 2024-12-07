@@ -28,7 +28,12 @@ function draw_header()
   term.clearLine()
   term.write("Storage")
 
-  local num = string.format("%s %s / %s", is_compiling(), available_slots(), max_slots())
+  local refresh_char=""
+  if is_refreshing then
+    refresh_char = "R"
+  end
+  
+  local num = string.format("%s %s / %s", refresh_char, available_slots(), max_slots())
 
   term.setCursorPos(w - string.len(num), 1)
   term.write(num)
