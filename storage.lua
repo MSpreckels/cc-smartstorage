@@ -88,8 +88,8 @@ function init()
         add_item(peripheral.call(peri, "getItemDetail", k))
       end
 
-      max_slots = slots + peripheral.call(peri, "size")
-      available_slots = slots + #peripheral.call(peri, "list")
+      max_slots = max_slots + peripheral.call(peri, "size")
+      available_slots = available_slots + #peripheral.call(peri, "list")
     end
   end
   history_print("Init Done.")
