@@ -61,7 +61,6 @@ end
 
 function compile_items()
   is_refreshing = true
-  history_print("Recompiling items...")
   set_loading_indicator(true)
   items = {}
   for i = 1, #peripheral.getNames(), 1 do
@@ -93,10 +92,8 @@ function compile_items()
   end
 
   sort()
-  draw_header()
   last_compiled = os.epoch("local")
 
-  history_print("Recompiling done.")
   set_loading_indicator(false)
   is_refreshing = false
 
