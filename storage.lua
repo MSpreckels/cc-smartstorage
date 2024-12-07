@@ -48,25 +48,24 @@ function set_loading_indicator(enabled)
 end
 
 -- Adds an item to the storage, appends the items table
-function add_item(peri, item, slot_index)
+function add_item(chest_name, item)
   if items[item.name] == nil then
     items[item.name] = {}
     items[item.name].name = item.name
     items[item.name].displayName = item.displayName
     items[item.name].total = item.count
     local inventory = {}
-    inventory.peripheral = peri
-    inventory.slot = slot_index
-    inventory.count = item.count
+    inventory[chest_name] = item.count
     items[item.name].inventories = {}
     table.insert(items[item.name].inventories, inventory)
   else
     items[item.name].total = items[item.name].total + item.count
-    local inventory = {}
-    inventory.peripheral = peri
-    inventory.slot = slot_index
-    inventory.count = item.count
-    table.insert(items[item.name].inventories, inventory)
+
+    if items[item.name].inventory[chest_name] then
+      items[item.name].inventory[chest_name] = items[item.name].inventory[chest_name] + item.count
+    else
+      items[item.name].inventory[chest_name] = item.count
+    end
   end
 end
 
@@ -74,10 +73,8 @@ function get_item(item)
   return items[item.name]
 end
 
-function remove_item(item, inventory_index, amount)
+function remove_item(item, chest_name, amount)
   items[item.name].total = items[item.name].total - amount
-
-  history_print(string.format("Remove: total %s", items[item.name].total))
 
   if items[item.name].total <= 0 then
     history_print(string.format("Remove: Item %s", item.name))
@@ -85,11 +82,9 @@ function remove_item(item, inventory_index, amount)
     return
   end
 
-  items[item.name].inventories[inventory_index].count = items[item.name].inventories[inventory_index].count - amount
-  history_print(string.format("Remove: Inventory Count %s", items[item.name].inventories[inventory_index].count))
-  if items[item.name].inventories[inventory_index].count <= 0 then
-    history_print(string.format("Remove: Inventory %s", inventory_index))
-    table.remove(items[item.name].inventories, inventory_index)
+  items[item.name].inventories[chest_name].count = items[item.name].inventories[chest_name].count - amount
+  if items[item.name].inventories[chest_name].count <= 0 then
+    items[item.name].inventories[chest_name] = nil
   end
 end
 
@@ -110,7 +105,7 @@ function init()
     if is_storage_chest(peri) then
       local list = peripheral.call(peri, "list")
       for k, v in pairs(list) do
-        add_item(peri, peripheral.call(peri, "getItemDetail", k), k)
+        add_item(peri, peripheral.call(peri, "getItemDetail", k))
       end
 
       max_slots = max_slots + peripheral.call(peri, "size")
@@ -130,7 +125,7 @@ function flush()
       for k, v in pairs(req_chest.list()) do
         req_chest.pushItems(peri, k)
         if v then
-          add_item(peri, v, k)
+          add_item(peri, v)
         end
       end
     end
@@ -150,7 +145,7 @@ function search(name)
   return results
 end
 
--- Request an item with amount by name
+-- Request an amount of items by name
 function request(name, amount)
   set_loading_indicator(true)
   local item = nil
@@ -176,15 +171,26 @@ function request(name, amount)
 
   history_print(string.format("Pulling %s items", amount_to_pull))
 
-  for i = 1, #item.inventories, 1 do
-    local inv = item.inventories[i]
-    if amount_to_pull > 0 and #req_chest.list() < req_chest.size() then
-      local pull_amount = math.min(inv.count, amount_to_pull)
-      remove_item(item, i, pull_amount)
-      req_chest.pullItems(inv.peripheral, inv.slot, pull_amount)
-      amount_to_pull = amount_to_pull - pull_amount
-    else
-      break
+  for k, v in pairs(item.inventories) do
+
+    local item_to_pull_from_inv = math.min(v, amount_to_pull)
+
+    while item_to_pull_from_inv >= 0 do
+      local foundSlots = {}
+      for slot, slot_item in pairs(peripheral.call(k, "list")) do
+          if slot_item.name == item.name then
+              table.insert(foundSlots, { slot = slot, count = item.count })
+          end
+      end
+
+      for _, slotData in pairs(foundSlots) do
+        local pull_amount_from_slot = math.min(slotData.count, item_to_pull_from_inv)
+        req_chest.pullItems(k, slotData.slot, pull_amount_from_slot)
+        remove_item(item, k, slot_amount)
+
+        item_to_pull_from_inv = item_to_pull_from_inv - pull_amount_from_slot
+      end
+
     end
   end
 
