@@ -21,6 +21,7 @@ items = {}
 last_searched_items = {}
 last_compiled = 0
 keyset = {}
+is_refreshing = false
 
 function upgrade(self)
   download("updater")
@@ -59,6 +60,7 @@ function set_loading_indicator(enabled)
 end
 
 function compile_items()
+  is_refreshing = true
   history_print("Recompiling items...")
   set_loading_indicator(true)
   items = {}
@@ -96,6 +98,7 @@ function compile_items()
 
   history_print("Recompiling done.")
   set_loading_indicator(false)
+  is_refreshing = false
 end
 
 function flush()
