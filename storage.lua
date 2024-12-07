@@ -325,6 +325,11 @@ if #items == 0 then
   compile_items()
 end
 
+co = coroutine.create(function ()
+       print("hi")
+     end)
+
+
 while true do
   local eventData = { os.pullEvent() }
   local event = eventData[1]
