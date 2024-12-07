@@ -78,7 +78,7 @@ function remove_item(item, amount)
   items[item.name].total = items[item.name].total - amount
 
   if items[item.name].total <= 0 then
-    table.remove(items, item.name)
+    items[item.name] = nil
   end
 end
 
