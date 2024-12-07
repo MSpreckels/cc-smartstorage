@@ -24,6 +24,7 @@ keyset = {}
 is_refreshing = false
 max_slots = 0
 available_slots = 0
+input = ""
 
 function update(self)
   download("updater")
@@ -165,7 +166,7 @@ function clear()
   term.clear()
   term.setCursorPos(1, 1)
   draw_header()
-  local input = ""
+  input = ""
   print_input("")
 end
 
