@@ -168,29 +168,30 @@ function request(name, amount)
 
   local amount_to_pull = math.min(item.total, amount)
 
+  if item.total < amount then
+    history_print(string.format("Not enough items in storage. Pulling %s items instead.", amount_to_pull))
+  end
+
   history_print(string.format("Pulling %s items", amount_to_pull))
 
   for k, v in pairs(item.inventories) do
 
     local item_to_pull_from_inv = math.min(v, amount_to_pull)
 
-    while item_to_pull_from_inv >= 0 do
-      local foundSlots = {}
-      for slot, slot_item in pairs(peripheral.call(k, "list")) do
-          if slot_item.name == item.name then
-              table.insert(foundSlots, { slot = slot, count = slot_item.count })
-          end
-      end
-
-      for _, slot in pairs(foundSlots) do
-        local pull_amount_from_slot = math.min(slot.count, item_to_pull_from_inv)
-        req_chest.pullItems(k, slot.slot, pull_amount_from_slot)
-        remove_item(item, k, pull_amount_from_slot)
-
-        item_to_pull_from_inv = item_to_pull_from_inv - pull_amount_from_slot
-      end
-
+    local foundSlots = {}
+    for slot, slot_item in pairs(peripheral.call(k, "list")) do
+        if slot_item.name == item.name then
+            table.insert(foundSlots, { slot = slot, count = slot_item.count })
+        end
     end
+
+    for _, slot in pairs(foundSlots) do
+      local pull_amount_from_slot = math.min(slot.count, item_to_pull_from_inv)
+      req_chest.pullItems(k, slot.slot, pull_amount_from_slot)
+      remove_item(item, k, pull_amount_from_slot)
+    end
+
+    amount_to_pull = amount_to_pull - item_to_pull_from_inv
   end
 
   set_loading_indicator(false)
