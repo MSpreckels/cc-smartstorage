@@ -48,14 +48,14 @@ function set_loading_indicator(enabled)
 end
 
 -- Adds an item to the storage, appends the items table
-function add_item(item)
+function add_item(peri, item, slot_index)
   if items[item.name] == nil then
     items[item.name] = {}
     items[item.name].displayName = item.displayName
     items[item.name].total = item.count
     local inventory = {}
     inventory.peripheral = peri
-    inventory.slot = k
+    inventory.slot = slot_index
     inventory.count = item.count
     items[item.name].inventories = {}
     table.insert(items[item.name].inventories, inventory)
@@ -63,7 +63,7 @@ function add_item(item)
     items[item.name].total = items[item.name].total + item.count
     local inventory = {}
     inventory.peripheral = peri
-    inventory.slot = k
+    inventory.slot = slot_index
     inventory.count = item.count
     table.insert(items[item.name].inventories, inventory)
   end
@@ -86,7 +86,7 @@ function init()
     if is_storage_chest(peri) then
       local list = peripheral.call(peri, "list")
       for k, v in pairs(list) do
-        add_item(peripheral.call(peri, "getItemDetail", k))
+        add_item(peri, peripheral.call(peri, "getItemDetail", k), k)
       end
 
       max_slots = max_slots + peripheral.call(peri, "size")
@@ -105,7 +105,7 @@ function flush()
       for k, v in pairs(req_chest.list()) do
         req_chest.pushItems(peri, k)
         if v then
-          add_item(v)
+          add_item(peri, v, k)
         end
       end
     end
@@ -149,10 +149,10 @@ function request(name, amount)
 
   local amount_to_pull = math.min(item.total, amount)
   for i = 1, #item.inventories, 1 do
-    local loc = item.inventories[i]
+    local inv = item.inventories[i]
     if amount_to_pull > 0 and #req_chest.list() < req_chest.size() then
-      local pull_amount = math.min(loc.count, amount_to_pull)
-      req_chest.pullItems(loc.peripheral, loc.slot, pull_amount)
+      local pull_amount = math.min(inv.count, amount_to_pull)
+      req_chest.pullItems(inv.peripheral, inv.slot, pull_amount)
       amount_to_pull = amount_to_pull - pull_amount
     else
       break
