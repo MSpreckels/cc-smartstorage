@@ -89,7 +89,7 @@ function remove_item(item, inventory_index, amount)
   history_print(string.format("Remove: Inventory Count %s", items[item.name].inventories[inventory_index].count))
   if items[item.name].inventories[inventory_index].count <= 0 then
     history_print(string.format("Remove: Inventory %s", inventory_index))
-    items[item.name].inventories[inventory_index] = nil
+    table.remove(items[item.name].inventories, inventory_index)
   end
 end
 
