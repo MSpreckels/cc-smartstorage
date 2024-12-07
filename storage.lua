@@ -27,6 +27,10 @@ function upgrade(self)
   shell.run("updater")
 end
 
+function set_request_chest(name)
+  req_chest = peripheral.wrap(name)
+end
+
 function max_slots()
   local slots = 0
   for i = 1, #peripheral.getNames(), 1 do
@@ -283,6 +287,15 @@ commands.slots = {
     local max = max_slots()
     local avail = available_slots()
     history_print(string.format("%s / %s (%.2f %%)", avail, max, (avail / max) * 100))
+  end
+}
+
+commands.request_chest = {
+  description = "sets a chest as the request chest",
+  usage = "request_chest",
+  func = function(args)
+    set_request_chest(args[1])
+    history_print(string.format("Set request chest to %s", args[1]))
   end
 }
 
