@@ -294,8 +294,8 @@ commands.request_chest = {
   description = "sets a chest as the request chest",
   usage = "request_chest",
   func = function(args)
-    set_request_chest(args[1])
-    history_print(string.format("Set request chest to %s", args[1]))
+    set_request_chest(args[2])
+    history_print(string.format("Set request chest to %s", args[2]))
   end
 }
 
