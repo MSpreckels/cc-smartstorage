@@ -60,7 +60,7 @@ function compile_items()
   items = {}
   for i = 1, #peripheral.getNames(), 1 do
     local peri = peripheral.getNames()[i]
-    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") then
+    if peri ~= "left" and peri ~= peripheral.getName(req_chest) and peripheral.hasType(peri, "inventory") and string.find(peri, "chest") then
       local list = peripheral.call(peri, "list")
       for k, v in pairs(list) do
         local detail = peripheral.call(peri, "getItemDetail", k)
