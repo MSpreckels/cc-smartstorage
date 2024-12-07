@@ -178,14 +178,14 @@ function request(name, amount)
       local foundSlots = {}
       for slot, slot_item in pairs(peripheral.call(k, "list")) do
           if slot_item.name == item.name then
-              table.insert(foundSlots, { slot = slot, count = item.count })
+              table.insert(foundSlots, { slot = slot, count = slot_item.count })
           end
       end
 
-      for k in pairs(foundSlots) do
-        local pull_amount_from_slot = math.min(foundSlots[k].count, item_to_pull_from_inv)
-        req_chest.pullItems(k, foundSlots[k].slot, pull_amount_from_slot)
-        remove_item(item, k, slot_amount)
+      for _, slot in pairs(foundSlots) do
+        local pull_amount_from_slot = math.min(slot.count, item_to_pull_from_inv)
+        req_chest.pullItems(k, slot.slot, pull_amount_from_slot)
+        remove_item(item, k, pull_amount_from_slot)
 
         item_to_pull_from_inv = item_to_pull_from_inv - pull_amount_from_slot
       end
