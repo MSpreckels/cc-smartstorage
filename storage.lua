@@ -81,8 +81,8 @@ function remove_item(item, chest_name, amount)
     return
   end
 
-  items[item.name].inventories[chest_name].count = items[item.name].inventories[chest_name].count - amount
-  if items[item.name].inventories[chest_name].count <= 0 then
+  items[item.name].inventories[chest_name] = items[item.name].inventories[chest_name] - amount
+  if items[item.name].inventories[chest_name] <= 0 then
     items[item.name].inventories[chest_name] = nil
   end
 end
