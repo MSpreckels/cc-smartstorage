@@ -61,10 +61,10 @@ function add_item(chest_name, item)
   else
     items[item.name].total = items[item.name].total + item.count
 
-    if items[item.name].inventory[chest_name] then
-      items[item.name].inventory[chest_name] = items[item.name].inventory[chest_name] + item.count
+    if items[item.name].inventories[chest_name] then
+      items[item.name].inventories[chest_name] = items[item.name].inventories[chest_name] + item.count
     else
-      items[item.name].inventory[chest_name] = item.count
+      items[item.name].inventories[chest_name] = item.count
     end
   end
 end
