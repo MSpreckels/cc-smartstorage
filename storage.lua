@@ -99,6 +99,9 @@ function compile_items()
   history_print("Recompiling done.")
   set_loading_indicator(false)
   is_refreshing = false
+
+  sleep(5)
+  compile_items()
 end
 
 function flush()
@@ -320,44 +323,38 @@ function handle_input(input)
   end
 end
 
-draw_header()
 local input = ""
 print_input("")
 
-if #items == 0 then
-  compile_items()
-end
-
-co = coroutine.create(function ()
-       print("hi")
-     end)
-
-
-while true do
-  local eventData = { os.pullEvent() }
-  local event = eventData[1]
-
-  if event == "char" then
-    input = input .. eventData[2]
-
-    print_input(input)
-  elseif event == "key" then
-    if keys.getName(eventData[2]) == "enter" then
-      local a = input
-      input = ""
+function storage_input()
+  while true do
+    local eventData = { os.pullEvent() }
+    local event = eventData[1]
+  
+    if event == "char" then
+      input = input .. eventData[2]
+  
       print_input(input)
-      handle_input(a)
-    elseif keys.getName(eventData[2]) == "backspace" then
-      input = input:sub(1, -2)
-      print_input(input)
-    elseif keys.getName(eventData[2]) == "up" then
-      scroll(-1)
-    elseif keys.getName(eventData[2]) == "down" then
-      scroll(1)
-    elseif keys.getName(eventData[2]) == "end" then
-      term.exit()
+    elseif event == "key" then
+      if keys.getName(eventData[2]) == "enter" then
+        local a = input
+        input = ""
+        print_input(input)
+        handle_input(a)
+      elseif keys.getName(eventData[2]) == "backspace" then
+        input = input:sub(1, -2)
+        print_input(input)
+      elseif keys.getName(eventData[2]) == "up" then
+        scroll(-1)
+      elseif keys.getName(eventData[2]) == "down" then
+        scroll(1)
+      elseif keys.getName(eventData[2]) == "end" then
+        term.exit()
+      end
+    elseif event == "mouse_scroll" then
+      scroll(eventData[2])
     end
-  elseif event == "mouse_scroll" then
-    scroll(eventData[2])
   end
 end
+
+parallel.waitForAny(storage_input, draw_header, compile_items)
